@@ -15,7 +15,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = '__all__'
+        exclude = ('groups','user_permissions','is_superuser','is_staff', 'is_active')
 
 
     def validate(self, attrs):
@@ -31,6 +31,22 @@ class RegisterSerializer(serializers.ModelSerializer):
                 'Name must start with uppercase letter!')
         return value
 
+    def create(self, validated_data):
+        user = User.objects.create(**validated_data)
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
+class UserListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'username', 'first_name', 'last_name')
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        exclude = ('password', 'user_permissions', 'groups',
+                   'is_superuser', 'is_staff', 'is_active')
 
 
 
